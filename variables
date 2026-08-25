@@ -1,0 +1,9 @@
+name = "Momina"
+age = 20
+gpa = 3.8
+is_student = True
+
+print("Name:", name)
+print("Age:", age)
+print("GPA:", gpa)
+print("Is Student:", is_student)
