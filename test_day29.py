@@ -1,9 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
-
+from selenium.webdriver.chrome.options import Options
 def test_checkout_flow():
-    driver = webdriver.Chrome()
+    options = Options()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    driver = webdriver.Chrome(options=options)
     driver.get("https://www.saucedemo.com/")
     
     # 1. Login
