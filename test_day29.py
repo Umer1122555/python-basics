@@ -1,3 +1,5 @@
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
@@ -21,10 +23,11 @@ def test_checkout_flow():
     # 3. Go to Cart
     driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()
     time.sleep(1)
+    checkout_btn = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.ID, "checkout"))
+)
+    checkout_btn.click()
     
-    # 4. Click Checkout
-    driver.find_element(By.ID, "checkout").click()
-    time.sleep(1)
     
     # 5. Fill Checkout Info
     driver.find_element(By.ID, "first-name").send_keys("Test")
