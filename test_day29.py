@@ -1,32 +1,15 @@
-
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-import pytest
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
+import tempfile
 import time
 
+import pytest
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-@pytest.fixture(params=["chrome", "firefox"])
-def driver(request):
-    if request.param == "chrome":
-        options = ChromeOptions()
-        options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--user-data-dir=C:\\temp\\chrome-profile")
-        d = webdriver.Chrome(options=options)
-    else:
-        options = FirefoxOptions()
-        options.add_argument("--headless")
-        d = webdriver.Firefox(options=options)
-    yield d
-    d.quit()
+
+
 
 
 def test_checkout_flow(driver):
@@ -44,34 +27,26 @@ def test_checkout_flow(driver):
         button.click()
     time.sleep(1)
 
-    # 3. Go to Cart
+    # 3. Go to cart
     driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()
     time.sleep(1)
 
+    # 4. Checkout
     checkout_btn = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.ID, "checkout"))
-)
+        EC.element_to_be_clickable((By.ID, "checkout"))
+    )
     checkout_btn.click()
-    
-    
 
-
-    checkout_btn = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.ID, "checkout"))
-)
-checkout_btn.click()
-
-    
+    # 5. Fill details
     driver.find_element(By.ID, "first-name").send_keys("Test")
     driver.find_element(By.ID, "last-name").send_keys("User")
     driver.find_element(By.ID, "postal-code").send_keys("12345")
     driver.find_element(By.ID, "continue").click()
     time.sleep(1)
 
-    
+    # 6. Finish
     driver.find_element(By.ID, "finish").click()
     time.sleep(2)
 
-    
     success_message = driver.find_element(By.CLASS_NAME, "complete-header").text
     assert success_message == "Thank you for your order!"
