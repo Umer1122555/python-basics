@@ -13,7 +13,17 @@ def driver(request):
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1920,1080")
+        options.add_argument("--disable-notifications")
+        options.add_argument("--disable-features=PasswordLeakDetection,PasswordManagerOnboarding")
         options.add_argument(f"--user-data-dir={tempfile.mkdtemp()}")
+        options.add_experimental_option(
+            "prefs",
+            {
+                "credentials_enable_service": False,
+                "profile.password_manager_enabled": False,
+                "profile.password_manager_leak_detection": False,
+            },
+        )
         d = webdriver.Chrome(options=options)
     else:
         options = FirefoxOptions()

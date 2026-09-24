@@ -49,4 +49,4 @@ def test_checkout_flow(driver):
     time.sleep(2)
 
     success_message = driver.find_element(By.CLASS_NAME, "complete-header").text
-    assert success_message == "Thank you for your order!"
+    assert success_message == "Wrong text"
