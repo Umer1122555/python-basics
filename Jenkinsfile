@@ -1,17 +1,24 @@
 pipeline {
     agent any
+    
     stages {
         stage('Setup') {
             steps {
                 echo 'Starting Capstone Pipeline...'
+                bat 'py -m pip install -r requirements.txt'
             }
         }
+        
         stage('Run Parallel Tests') {
             steps {
-                bat '"C:\\Users\\New Computer Arena\\AppData\\Local\\Programs\\Python\\Python314\\python.exe" -m pytest -n 2 -v --html=report.html --self-contained-html'
+                // triple quotes se space wala path issue khatam ho jayega
+                bat '''
+                    py -m pytest -n 2 -v --html=report.html --self-contained-html
+                '''
             }
         }
     }
+    
     post {
         always {
             publishHTML([
@@ -22,31 +29,14 @@ pipeline {
                 reportFiles: 'report.html', 
                 reportName: 'Capstone Test Report'
             ])
-        }
-        success {
-            echo 'Build PASSED - Ready for Deployment!'
-            emailext(
-                subject: "PASS: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                body: """<p>Good news! Build PASSED.</p>
-                        <p>Job: ${env.JOB_NAME}<br>
-                        Build Number: ${env.BUILD_NUMBER}<br>
-                        Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a><br>
-                        Report: <a href="${env.BUILD_URL}Capstone_20Test_20Report">Click Here</a></p>""",
-                to: "umerkhan2211e@gmail.com",
-                mimeType: 'text/html'
-            )
-        }
-        failure {
-            echo 'Build FAILED - Check Report!'
-            emailext(
-                subject: "FAIL: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                body: """<p>Build FAILED - Please check.</p>
-                        <p>Job: ${env.JOB_NAME}<br>
-                        Build Number: ${env.BUILD_NUMBER}<br>
-                        Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a><br>
-                        Report: <a href="${env.BUILD_URL}Capstone_20Test_20Report">Click Here</a></p>""",
-                to: "umerkhan2211e@gmail.com",
-                mimeType: 'text/html',
+            
+            echo "Build finished with status: ${currentBuild.currentResult}"
+            
+            emailext (
+                to: 'umerkhan2211e@gmail.com',
+                subject: "Capstone Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
+                body: "Build ${currentBuild.currentResult}. Please check the attached report or Jenkins.",
+                attachLog: true,
                 attachmentsPattern: 'report.html'
             )
         }
